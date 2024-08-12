@@ -15,13 +15,51 @@ Console.WriteLine(cache.Get(4));        // returns 4
 
 class LRUCache(int capacity)
 {
-    public void Put(int key, int value)
+   Dictionary<int, int> cache = new Dictionary<int, int>(capacity: cacheCapacity);
+Dictionary<int, int> tempCache = new Dictionary<int, int>(capacity: cacheCapacity);
+public int Get(int key)
+{
+    int value;
+    if (cache.ContainsKey(key))
     {
-        throw new NotImplementedException();
+        cache.Remove(key, out value);
+
+        foreach (var c in cache)
+            tempCache.Add(c.Key, c.Value);
+
+        tempCache.Add(key, value);
+
+        cache = ToCopyDictionary(tempCache, cache);
+        return cache[key];
     }
 
-    public int Get(int key)
+    return -1;
+}
+
+public void Put(int key, int value)
+{
+    if (!cache.ContainsKey(key) && cacheCapacity == cache.Count)
     {
-        throw new NotImplementedException();
+        cache.Remove(cache.First().Key);
+
+        foreach (var c in cache)
+            tempCache.Add(c.Key, c.Value);
+        tempCache.Add(key, value);
+        cache = ToCopyDictionary(tempCache, cache);
+        return;
     }
+    else if (cache.ContainsKey(key))
+        return;
+
+    cache.Add(key, value);
+}
+
+public Dictionary<int,int> ToCopyDictionary(Dictionary<int, int> from, Dictionary<int, int> to)
+{
+    to.Clear();
+    foreach (var c in from)
+        to.Add(c.Key, c.Value);
+    tempCache.Clear();
+    return to;
+}
 }
